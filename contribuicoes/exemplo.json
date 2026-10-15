@@ -1,0 +1,17 @@
+{
+  "formato": "siapp-contribuicao",
+  "versao_formato": 1,
+  "id": "7c1e2f4a-3b5d-4e6f-8a9b-0c1d2e3f4a5b",
+  "criado_em": "2026-10-15T19:30:00-03:00",
+  "siapp_versao": "0.6.0",
+  "licenca": "CC-BY-4.0",
+  "autor": { "nome": "Ruan da Silva Nobre", "instituicao": "UFAL" },
+  "vocabulario": {
+    "palavras": [],
+    "correcoes": [
+      { "de": "BARIGIRAS", "para": "BARREIRAS" },
+      { "de": "T-GRMAA3-RN", "para": "7-GRM-13-RN" }
+    ],
+    "manter_original": []
+  }
+}

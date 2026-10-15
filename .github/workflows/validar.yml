@@ -1,0 +1,20 @@
+name: validar
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "jsonschema[format]" pytest
+      - name: Validar contribuições
+        run: python ferramentas/validar.py
+      - name: Testes das ferramentas
+        run: pytest -q

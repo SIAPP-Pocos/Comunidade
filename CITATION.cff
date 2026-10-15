@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "Se usar estes dados, cite-os com as informações abaixo."
+title: "SIAPP — Dados comunitários do acervo REATE"
+type: dataset
+authors:
+  - family-names: "Nobre"
+    given-names: "Ruan da Silva"
+    affiliation: "Universidade Federal de Alagoas (UFAL)"
+license: CC-BY-4.0
+repository: "https://github.com/SIAPP-Pocos/SIAPP-dados"
+keywords: [REATE, ANP, dados abertos, perfis de poço, OCR, curadoria colaborativa]
+abstract: >-
+  Correções e dados tratados, revisados pela comunidade, do acervo público de poços
+  da ANP disponibilizado pelo portal REATE.

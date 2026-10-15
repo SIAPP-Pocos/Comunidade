@@ -1,0 +1,29 @@
+name: publicar base
+
+# Ao criar uma etiqueta de versão (ex.: v2026.10.0), compila todas as
+# contribuições e publica a base consolidada como Release, para o SIAPP baixar.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "jsonschema[format]"
+      - run: python ferramentas/validar.py
+      - run: python ferramentas/compilar.py
+      - name: Criar Release com a base compilada
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/siapp-dados.sqlite dist/vocabulario.json \
+            --title "Base SIAPP $GITHUB_REF_NAME" \
+            --notes "Base consolidada de todas as contribuições até esta versão. Licença CC-BY 4.0."
