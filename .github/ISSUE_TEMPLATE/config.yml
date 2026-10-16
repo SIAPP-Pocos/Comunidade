@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Erro ou ideia para o aplicativo SIAPP
+    url: https://github.com/SIAPP-Pocos/siapp/issues/new/choose
+    about: Problemas do aplicativo vão para o repositório de código.

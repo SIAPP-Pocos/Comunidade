@@ -21,3 +21,10 @@
 pip install "jsonschema[format]"
 python ferramentas/validar.py
 ```
+
+## Revisão
+
+Todo pull request precisa da aprovação de um mantenedor (`CODEOWNERS`). Na revisão,
+o mantenedor confere uma amostra das correções contra a imagem da página no REATE.
+
+Ao participar, você concorda com o [Código de conduta](CODE_OF_CONDUCT.md).

@@ -1,0 +1,36 @@
+name: Correção errada na base
+description: Uma correção ou palavra do dicionário está trocando texto certo por errado.
+title: "[correção] "
+labels: ["dados: correção", "triagem"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Indique **onde** a correção errada aparece. Não anexe o arquivo do REATE:
+        informe o poço, o arquivo e a página.
+  - type: input
+    id: palavras
+    attributes:
+      label: Correção questionada
+      placeholder: "CANHONEADO → CANHONEIO"
+    validations:
+      required: true
+  - type: input
+    id: local
+    attributes:
+      label: Poço, arquivo e página
+      placeholder: "7-GMR-13-RN · 7GMR_0013__RN_pasta_poco_pub.pdf · pág. 12"
+    validations:
+      required: true
+  - type: textarea
+    id: documento
+    attributes:
+      label: O que está escrito no papel
+      description: Confira na imagem da página. Um recorte da imagem ajuda muito.
+    validations:
+      required: true
+  - type: input
+    id: versao
+    attributes:
+      label: Versão da base
+      placeholder: "v2026.10.0"

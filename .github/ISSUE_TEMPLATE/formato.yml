@@ -1,0 +1,16 @@
+name: Proposta para o formato de contribuição
+description: Sugerir um campo, tipo de dado ou regra nova no esquema.
+title: "[formato] "
+labels: ["formato", "triagem"]
+body:
+  - type: textarea
+    id: necessidade
+    attributes:
+      label: Que dado ainda não cabe no formato atual?
+    validations:
+      required: true
+  - type: textarea
+    id: exemplo
+    attributes:
+      label: Exemplo em JSON
+      render: json

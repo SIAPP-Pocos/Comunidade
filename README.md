@@ -1,5 +1,8 @@
 # SIAPP — Dados comunitários do acervo REATE
 
+[![validar](https://github.com/SIAPP-Pocos/SIAPP-dados/actions/workflows/validar.yml/badge.svg)](https://github.com/SIAPP-Pocos/SIAPP-dados/actions/workflows/validar.yml)
+[![licença: CC BY 4.0](https://img.shields.io/badge/licen%C3%A7a-CC%20BY%204.0-lightgrey)](LICENSE)
+
 Base aberta e revisada de **correções e dados tratados** do acervo público de poços
 da ANP (portal [REATE](https://reate.cprm.gov.br/anp/TERRESTRE), ANP/CPRM),
 produzida com a ferramenta [SIAPP](https://github.com/SIAPP-Pocos/siapp).
