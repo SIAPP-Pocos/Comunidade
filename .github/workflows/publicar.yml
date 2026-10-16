@@ -19,7 +19,7 @@ jobs:
           python-version: "3.12"
       - run: pip install "jsonschema[format]"
       - run: python ferramentas/validar.py
-      - run: python ferramentas/compilar.py
+      - run: python ferramentas/compilar.py --versao "$GITHUB_REF_NAME"
       - name: Criar Release com a base compilada
         env:
           GH_TOKEN: ${{ github.token }}

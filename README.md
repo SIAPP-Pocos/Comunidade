@@ -8,22 +8,34 @@ da ANP (portal [REATE](https://reate.cprm.gov.br/anp/TERRESTRE), ANP/CPRM),
 produzida com a ferramenta [SIAPP](https://github.com/SIAPP-Pocos/siapp).
 
 Quem usa o SIAPP baixa esta base e recebe os documentos **já tratados**: palavras
-lidas errado pelo OCR corrigidas, vocabulário técnico, e (em breve) textos extraídos
-e transcrições conferidas por pessoas.
+lidas errado pelo OCR corrigidas, vocabulário técnico e **dados transcritos e
+conferidos por pessoas** (topos de formação, revestimentos, testes de formação,
+intervalos-alvo…), cada um com a página e o trecho do documento de onde saiu.
 
-> **Estado:** formato de contribuição **v1, em rascunho**. Pode mudar até a primeira
-> versão estável da base.
+> **Estado:** formato de contribuição **v2** (SIAPP 0.7 ou mais novo; a v1 continua
+> aceita). Pode mudar até a primeira versão estável da base.
 
 ## O que tem aqui
 
 ```
 contribuicoes/      um arquivo JSON por pacote de contribuição (fonte da verdade)
-esquema/            formato oficial das contribuições (JSON Schema)
+esquema/            formato oficial das contribuições (JSON Schema, v1 e v2)
 vocabulario/        dicionário de domínio da comunidade
 ferramentas/
   validar.py        confere cada contribuição (roda automaticamente em todo pull request)
   compilar.py       junta tudo numa base única (SQLite + JSON)
+tests/dados/        pacote exportado de verdade pelo SIAPP: o contrato entre os repositórios
 ```
+
+## O que vai num pacote
+
+| Parte | O que é | Exemplo |
+|---|---|---|
+| `vocabulario.correcoes` | forma lida pelo OCR → forma escrita no papel | `BARIGIRAS` → `BARREIRAS` |
+| `vocabulario.palavras` | termos técnicos que viram atalho de busca | `Açu` |
+| `vocabulario.manter_original` | palavras que a correção automática não deve mexer | `AMOSTRAS` |
+| `fatos` | dado transcrito, com poço, tipo, profundidade e **fonte** (SHA-256 e caminho do documento no REATE, página e caixa na imagem) | teste de formação 590,0–610,5 m, pág. 28 |
+| `apelidos` | outras grafias do nome de um poço | `7GMR0013RN` → `7-GMR-13-RN` |
 
 ## Como os dados entram
 
