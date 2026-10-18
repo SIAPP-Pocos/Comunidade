@@ -6,6 +6,8 @@ compilada** é publicada com etiquetas `vAAAA.MM.N`.
 
 ## [Não lançado]
 ### Adicionado
+- Tipo de fato `propriedade_fluido` (grau API do óleo, densidade relativa do gás, RGO…),
+  aceito no formato v2 — usado pelo SIAPP 0.29 na viabilidade de injeção.
 - Formato de contribuição **v2**: dados transcritos (`fatos`) com fonte — SHA-256 e
   caminho do documento no REATE, página e caixa na imagem — e `apelidos` de poço.
   A v1 continua aceita.
