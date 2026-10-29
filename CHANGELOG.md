@@ -6,6 +6,8 @@ compilada** é publicada com etiquetas `vAAAA.MM.N`.
 
 ## [Não lançado]
 ### Adicionado
+- Interpretações (v3) aceitam os parâmetros da referência do GR do SIAPP 0.36 (`gr_referencia`,
+  `gr_estatistica`, `gr_ref_topo`, `gr_ref_base`).
 - Formato de contribuição **v3** (SIAPP 0.35): `interpretacoes` — interpretações de perfil
   da biblioteca do SIAPP (avaliação de formação com arquivo, curvas, métodos, parâmetros e
   resumo por intervalo, sem curvas calculadas) — e o tipo de fato `trecho` (citação de texto

@@ -130,3 +130,12 @@ def test_compilar_leva_as_interpretacoes(tmp_path):
     poco, autor, dados = con.execute("SELECT poco, autor, dados FROM interpretacoes").fetchone()
     d = json.loads(dados)
     assert poco == "7-TST-1-RN" and autor == "Ruan da Silva Nobre" and d["parametros"]["rw"] == 0.05
+
+
+def test_parametros_da_referencia_do_gr_aceitos(tmp_path):
+    """SIAPP 0.36: onde e como o GR limpo e o da argila foram estimados."""
+    c = _ler(DO_APP_V3)
+    c["interpretacoes"][0]["parametros"].update(gr_referencia="janela", gr_estatistica="extremos",
+                                                gr_ref_topo=1650.0, gr_ref_base=1750.0)
+    c["interpretacoes"][0]["parametros_automaticos"]["gr_limpo"] = "mínimo do GR na janela (1650,0–1750,0 m)"
+    assert validar.validar(_pasta(tmp_path, c)) == []
