@@ -15,6 +15,8 @@
   transcritos página a página e conferidos na imagem.
 - Todo fato precisa da fonte: o SIAPP grava o documento (SHA-256 e caminho no REATE),
   a página e a caixa desenhada sobre a imagem.
+- Interpretação de perfil (v3) vai com o arquivo (SHA-256), as curvas, os métodos e todos os
+  parâmetros — o revisor confere que o resumo é coerente e, se quiser, refaz no SIAPP.
 - Em caso de **conflito** com outra contribuição, o validador mostra os dois autores:
   confira a imagem da página e combine na revisão do pull request.
 

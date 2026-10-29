@@ -6,6 +6,15 @@ compilada** é publicada com etiquetas `vAAAA.MM.N`.
 
 ## [Não lançado]
 ### Adicionado
+- Formato de contribuição **v3** (SIAPP 0.35): `interpretacoes` — interpretações de perfil
+  da biblioteca do SIAPP (avaliação de formação com arquivo, curvas, métodos, parâmetros e
+  resumo por intervalo, sem curvas calculadas) — e o tipo de fato `trecho` (citação de texto
+  livre, até 4000 caracteres), que o SIAPP 0.31 já exportava. A v1 e a v2 continuam aceitas.
+- Validador: interpretação com intervalo de base acima do topo é recusada; a mesma
+  interpretação enviada por autores diferentes é conflito.
+- Base compilada: tabela `interpretacoes` (o item do pacote em JSON, com autor e pacote de
+  origem). O SIAPP 0.35+ aplica; versões anteriores ignoram a tabela (`versao_formato_base` segue 1).
+- Pacote v3 exportado pelo SIAPP 0.35 (perfil sintético) como teste de contrato.
 - Tipo de fato `propriedade_fluido` (grau API do óleo, densidade relativa do gás, RGO…),
   aceito no formato v2 — usado pelo SIAPP 0.29 na viabilidade de injeção.
 - Formato de contribuição **v2**: dados transcritos (`fatos`) com fonte — SHA-256 e

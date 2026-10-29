@@ -2,7 +2,7 @@
 Valida todas as contribuições em contribuicoes/*.json.
 
 Regras, além do esquema JSON (esquema/contribuicao-v<N>.schema.json, conforme
-o campo versao_formato de cada pacote; as versões 1 e 2 são aceitas):
+o campo versao_formato de cada pacote; as versões 1, 2 e 3 são aceitas):
   - cada pacote tem `id` único no repositório;
   - nenhuma correção troca um número isolado (o esquema exige letra em "de");
   - fato com base acima do topo é recusado;
@@ -10,6 +10,8 @@ o campo versao_formato de cada pacote; as versões 1 e 2 são aceitas):
     ou o mesmo fato (mesmo id) enviado por autores diferentes, precisam ser
     resolvidos na revisão — o validador falha e mostra os autores.
     O mesmo autor reenviando um fato com o mesmo id é uma atualização (vale o mais novo).
+  - interpretação de perfil (v3) com intervalo de base acima do topo é recusada; a mesma
+    interpretação (mesmo id) enviada por autores diferentes é CONFLITO, como os fatos.
 
 Uso:  python ferramentas/validar.py        (código de saída 1 se houver erro)
 """
@@ -22,7 +24,7 @@ import sys
 import unicodedata
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VERSOES = (1, 2)
+VERSOES = (1, 2, 3)
 
 
 def normalizar(t: str) -> str:
@@ -41,7 +43,7 @@ def validar(pasta: str | None = None) -> list[str]:
     validadores = {v: jsonschema.Draft202012Validator(carregar_esquema(v),
                                                       format_checker=jsonschema.FormatChecker())
                    for v in VERSOES}
-    erros, ids, correcoes, fatos = [], {}, {}, {}
+    erros, ids, correcoes, fatos, interps = [], {}, {}, {}, {}
     for caminho in sorted(glob.glob(os.path.join(pasta, "*.json"))):
         nome = os.path.basename(caminho)
         try:
@@ -78,6 +80,17 @@ def validar(pasta: str | None = None) -> list[str]:
                 erros.append(f"{nome}: CONFLITO no fato {f['id']} ({f.get('poco')}): enviado por "
                              f"{autor} e por {anterior[0]} ({anterior[1]}) — resolva na revisão")
             fatos.setdefault(f.get("id"), (autor, nome))
+        for i in c.get("interpretacoes", []):
+            for k, iv in enumerate(i.get("intervalos", [])):
+                t, b = iv.get("topo"), iv.get("base")
+                if isinstance(t, (int, float)) and isinstance(b, (int, float)) and b <= t:
+                    erros.append(f"{nome}: interpretação {i.get('id')}: intervalo {k + 1} com base ({b}) "
+                                 f"acima do topo ({t})")
+            anterior = interps.get(i.get("id"))
+            if anterior and anterior[0] != autor:
+                erros.append(f"{nome}: CONFLITO na interpretação {i['id']} ({i.get('poco')}): enviada por "
+                             f"{autor} e por {anterior[0]} ({anterior[1]}) — resolva na revisão")
+            interps.setdefault(i.get("id"), (autor, nome))
     return erros
 
 

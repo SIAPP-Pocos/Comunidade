@@ -1,0 +1,605 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/SIAPP-Pocos/SIAPP-dados/esquema/contribuicao-v3.schema.json",
+  "title": "Contribuição SIAPP — versão 3",
+  "description": "Pacote de correções e dados tratados do acervo público REATE (ANP/CPRM), gerado pelo SIAPP 0.35 ou mais novo. Nunca contém os arquivos originais do portal: documentos são identificados pelo caminho no REATE e pelo hash SHA-256 do conteúdo. Novidades em relação à versão 2: interpretações de perfil (avaliações de formação com parâmetros e resumo por intervalo, sem as curvas calculadas) e o tipo de fato `trecho` (citação de texto livre).",
+  "type": "object",
+  "required": [
+    "formato",
+    "versao_formato",
+    "id",
+    "criado_em",
+    "autor",
+    "licenca"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "formato": {
+      "const": "siapp-contribuicao"
+    },
+    "versao_formato": {
+      "const": 3
+    },
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Identificador único do pacote."
+    },
+    "criado_em": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "siapp_versao": {
+      "type": "string"
+    },
+    "licenca": {
+      "const": "CC-BY-4.0",
+      "description": "Ao contribuir, o autor licencia o conteúdo sob CC-BY 4.0."
+    },
+    "autor": {
+      "type": "object",
+      "required": [
+        "nome"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "nome": {
+          "type": "string",
+          "minLength": 2
+        },
+        "instituicao": {
+          "type": "string"
+        },
+        "orcid": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{4}-\\d{4}-\\d{3}[\\dX]$"
+        }
+      }
+    },
+    "vocabulario": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "palavras": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 2
+          },
+          "uniqueItems": true
+        },
+        "correcoes": {
+          "type": "array",
+          "description": "Formas lidas errado pelo OCR e a forma correta. Nunca números isolados.",
+          "items": {
+            "type": "object",
+            "required": [
+              "de",
+              "para"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "de": {
+                "type": "string",
+                "minLength": 3,
+                "pattern": "[A-Za-zÀ-ÿ]"
+              },
+              "para": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "manter_original": {
+          "type": "array",
+          "description": "Palavras que a correção automática NÃO deve alterar.",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "documentos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "bacia",
+          "poco",
+          "caminho_remoto",
+          "sha256",
+          "bytes"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "bacia": {
+            "type": "string"
+          },
+          "poco": {
+            "type": "string"
+          },
+          "caminho_remoto": {
+            "type": "string",
+            "pattern": "^/",
+            "description": "Caminho do arquivo no compartilhamento da bacia no REATE."
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "texto": {
+            "type": "object",
+            "description": "Texto extraído (OCR ou embutido), para quem importar não precisar processar.",
+            "required": [
+              "arquivo",
+              "metodo",
+              "n_paginas"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "arquivo": {
+                "type": "string",
+                "pattern": "^textos/[0-9a-f]{64}\\.json\\.gz$"
+              },
+              "metodo": {
+                "enum": [
+                  "embutido",
+                  "ocr",
+                  "misto"
+                ]
+              },
+              "idioma": {
+                "type": "string"
+              },
+              "versao_extracao": {
+                "type": "integer"
+              },
+              "n_paginas": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "fatos": {
+      "type": "array",
+      "description": "Dados transcritos e conferidos na imagem (ou marcados sobre o perfil).",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "poco",
+          "tipo",
+          "criado_em"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "poco": {
+            "type": "string",
+            "minLength": 3,
+            "description": "Nome ANP do poço (ex.: 7-GMR-13-RN)."
+          },
+          "tipo": {
+            "enum": [
+              "topo_formacao",
+              "intervalo_alvo",
+              "profundidade_final",
+              "revestimento",
+              "teste_formacao",
+              "canhoneio",
+              "mesa_rotativa",
+              "contato_fluido",
+              "propriedade_fluido",
+              "observacao",
+              "trecho"
+            ]
+          },
+          "nome": {
+            "type": "string"
+          },
+          "valor": {
+            "type": "string"
+          },
+          "unidade": {
+            "type": "string"
+          },
+          "prof_topo": {
+            "type": "number",
+            "minimum": -100,
+            "maximum": 12000
+          },
+          "prof_base": {
+            "type": "number",
+            "minimum": -100,
+            "maximum": 12000
+          },
+          "observacao": {
+            "type": "string",
+            "maxLength": 4000
+          },
+          "criado_em": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fonte": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "De onde o dado saiu. Quem revisa abre o documento no REATE, vai à página e confere a caixa.",
+            "properties": {
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "caminho_remoto": {
+                "type": "string",
+                "pattern": "^/"
+              },
+              "bacia": {
+                "type": "string"
+              },
+              "pagina": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "caixa": {
+                "type": "array",
+                "minItems": 4,
+                "maxItems": 4,
+                "items": {
+                  "type": "number",
+                  "minimum": -0.01,
+                  "maximum": 1.01
+                },
+                "description": "Retângulo na imagem da página: [x0, y0, x1, y1], de 0 a 1 (fração da largura e da altura)."
+              }
+            }
+          }
+        }
+      }
+    },
+    "apelidos": {
+      "type": "array",
+      "description": "Outras grafias do nome de um poço.",
+      "items": {
+        "type": "object",
+        "required": [
+          "apelido",
+          "poco"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "apelido": {
+            "type": "string",
+            "minLength": 3
+          },
+          "poco": {
+            "type": "string",
+            "minLength": 3
+          }
+        }
+      }
+    },
+    "interpretacoes": {
+      "type": "array",
+      "description": "Interpretações de perfil da biblioteca do SIAPP: avaliação de formação (Vsh, φ, Sw, net pay) num poço, com o arquivo de perfil (hash), as curvas, os métodos, os parâmetros e o resumo de cada intervalo. Sem curvas calculadas: quem tem o mesmo arquivo refaz o cálculo.",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "poco",
+          "criado_em",
+          "parametros",
+          "intervalos"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "poco": {
+            "type": "string",
+            "minLength": 3
+          },
+          "criado_em": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "titulo": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "comentario": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "siapp_versao": {
+            "type": "string"
+          },
+          "arquivo": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "caminho_remoto": {
+                "type": "string",
+                "pattern": "^/"
+              },
+              "bacia": {
+                "type": "string"
+              },
+              "nome": {
+                "type": "string"
+              }
+            }
+          },
+          "curvas_usadas": {
+            "type": "object",
+            "propertyNames": {
+              "enum": [
+                "GR",
+                "RHOB",
+                "NPHI",
+                "DT",
+                "RT",
+                "CALI",
+                "BS",
+                "DRHO"
+              ]
+            },
+            "additionalProperties": {
+              "type": "object",
+              "required": [
+                "mnemonico"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "quadro": {
+                  "type": "string"
+                },
+                "mnemonico": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "unidade": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "metodos": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "vsh": {
+                "enum": [
+                  "linear",
+                  "larionov_terciario",
+                  "larionov_antigo"
+                ]
+              },
+              "phi": {
+                "enum": [
+                  "densidade",
+                  "densidade_neutrao",
+                  "sonico"
+                ]
+              },
+              "sw": {
+                "enum": [
+                  "archie",
+                  "simandoux"
+                ]
+              }
+            }
+          },
+          "parametros": {
+            "type": "object",
+            "propertyNames": {
+              "enum": [
+                "vsh_metodo",
+                "gr_limpo",
+                "gr_argila",
+                "phi_metodo",
+                "rho_matriz",
+                "rho_fluido",
+                "dt_matriz",
+                "dt_fluido",
+                "phi_argila",
+                "sw_metodo",
+                "rw",
+                "a",
+                "m",
+                "n",
+                "rsh",
+                "corte_vsh",
+                "corte_phi",
+                "corte_sw",
+                "qc_cali_pol",
+                "qc_drho",
+                "bs_pol",
+                "passo"
+              ]
+            },
+            "additionalProperties": {
+              "type": [
+                "number",
+                "string",
+                "null"
+              ],
+              "maxLength": 40
+            }
+          },
+          "parametros_automaticos": {
+            "type": "object",
+            "propertyNames": {
+              "enum": [
+                "vsh_metodo",
+                "gr_limpo",
+                "gr_argila",
+                "phi_metodo",
+                "rho_matriz",
+                "rho_fluido",
+                "dt_matriz",
+                "dt_fluido",
+                "phi_argila",
+                "sw_metodo",
+                "rw",
+                "a",
+                "m",
+                "n",
+                "rsh",
+                "corte_vsh",
+                "corte_phi",
+                "corte_sw",
+                "qc_cali_pol",
+                "qc_drho",
+                "bs_pol",
+                "passo"
+              ]
+            },
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "passo_m": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "intervalos": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 50,
+            "items": {
+              "type": "object",
+              "required": [
+                "topo",
+                "base"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "nome": {
+                  "type": "string"
+                },
+                "origem": {
+                  "type": "string"
+                },
+                "topo": {
+                  "type": "number",
+                  "minimum": -100,
+                  "maximum": 12000
+                },
+                "base": {
+                  "type": "number",
+                  "minimum": -100,
+                  "maximum": 12000
+                },
+                "bruto_m": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "com_dados_m": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "reservatorio_m": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "net_pay_m": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "ntg": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "ntg_pay": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "vsh_medio": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "phi_media_pay": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "sw_media_pay": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "phi_media_res": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "hpv_m": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "qc_arrombado_m": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "qc_drho_m": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "pay_com_qc_m": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

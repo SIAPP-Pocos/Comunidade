@@ -10,21 +10,22 @@ produzida com a ferramenta [SIAPP](https://github.com/SIAPP-Pocos/siapp).
 Quem usa o SIAPP baixa esta base e recebe os documentos **já tratados**: palavras
 lidas errado pelo OCR corrigidas, vocabulário técnico e **dados transcritos e
 conferidos por pessoas** (topos de formação, revestimentos, testes de formação,
-intervalos-alvo…), cada um com a página e o trecho do documento de onde saiu.
+intervalos-alvo…), cada um com a página e o trecho do documento de onde saiu, e
+**interpretações de perfil** (avaliações de formação com os parâmetros de quem fez).
 
-> **Estado:** formato de contribuição **v2** (SIAPP 0.7 ou mais novo; a v1 continua
-> aceita). Pode mudar até a primeira versão estável da base.
+> **Estado:** formato de contribuição **v3** (SIAPP 0.35 ou mais novo; a v1 e a v2
+> continuam aceitas). Pode mudar até a primeira versão estável da base.
 
 ## O que tem aqui
 
 ```
 contribuicoes/      um arquivo JSON por pacote de contribuição (fonte da verdade)
-esquema/            formato oficial das contribuições (JSON Schema, v1 e v2)
+esquema/            formato oficial das contribuições (JSON Schema, v1, v2 e v3)
 vocabulario/        dicionário de domínio da comunidade
 ferramentas/
   validar.py        confere cada contribuição (roda automaticamente em todo pull request)
   compilar.py       junta tudo numa base única (SQLite + JSON)
-tests/dados/        pacote exportado de verdade pelo SIAPP: o contrato entre os repositórios
+tests/dados/        pacotes exportados de verdade pelo SIAPP: o contrato entre os repositórios
 ```
 
 ## O que vai num pacote
@@ -36,6 +37,7 @@ tests/dados/        pacote exportado de verdade pelo SIAPP: o contrato entre os 
 | `vocabulario.manter_original` | palavras que a correção automática não deve mexer | `AMOSTRAS` |
 | `fatos` | dado transcrito, com poço, tipo, profundidade e **fonte** (SHA-256 e caminho do documento no REATE, página e caixa na imagem) | teste de formação 590,0–610,5 m, pág. 28 |
 | `apelidos` | outras grafias do nome de um poço | `7GMR0013RN` → `7-GMR-13-RN` |
+| `interpretacoes` (v3) | avaliação de formação: poço, arquivo de perfil (SHA-256), curvas, métodos (Vsh, φ, Sw), parâmetros e o resumo de cada intervalo — **sem as curvas calculadas**; quem tem o mesmo arquivo refaz o cálculo | Açu 1005–1035 m, Archie com Rw 0,05: net pay 10 m |
 
 ## Como os dados entram
 

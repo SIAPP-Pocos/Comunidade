@@ -1,0 +1,148 @@
+{
+  "formato": "siapp-contribuicao",
+  "versao_formato": 3,
+  "id": "0535246e-0dbf-49be-afd5-7931b6498043",
+  "criado_em": "2026-10-28T21:07:35-03:00",
+  "siapp_versao": "0.35.0",
+  "licenca": "CC-BY-4.0",
+  "autor": {
+    "nome": "Ruan da Silva Nobre",
+    "instituicao": "UFAL"
+  },
+  "vocabulario": {
+    "palavras": [],
+    "correcoes": [
+      {
+        "de": "BARIGIRAS",
+        "para": "BARREIRAS"
+      }
+    ],
+    "manter_original": []
+  },
+  "fatos": [
+    {
+      "id": "9313d45b-1ba1-4f5d-89bb-b46d68f173f1",
+      "tipo": "intervalo_alvo",
+      "nome": "Açu",
+      "prof_topo": 1005.0,
+      "prof_base": 1035.0,
+      "criado_em": "2026-10-28T21:07:35-03:00",
+      "poco": "7-TST-1-RN",
+      "fonte": {
+        "sha256": "9dbe1444850b7de5e6ee29a1c7eb58832c214f0acc3778b5d8ef201ce39cd9e7",
+        "bacia": "Potiguar"
+      }
+    },
+    {
+      "id": "2d45bf3f-6e79-4c84-b001-6bca046c6c59",
+      "tipo": "trecho",
+      "observacao": "Arenito fino a médio,\n\ncom óleo.",
+      "criado_em": "2026-10-28T21:07:35-03:00",
+      "poco": "7-TST-1-RN"
+    }
+  ],
+  "apelidos": [],
+  "interpretacoes": [
+    {
+      "id": "4e32d411-0d08-4dbd-929f-bbd7c1248002",
+      "poco": "7-TST-1-RN",
+      "criado_em": "2026-10-28T21:07:35-03:00",
+      "titulo": "Açu com Archie, Rw 0,05",
+      "comentario": "Rw da lama do AGP.",
+      "arquivo": {
+        "sha256": "9dbe1444850b7de5e6ee29a1c7eb58832c214f0acc3778b5d8ef201ce39cd9e7",
+        "bacia": "Potiguar",
+        "nome": "tst.las"
+      },
+      "curvas_usadas": {
+        "GR": {
+          "quadro": "LAS",
+          "mnemonico": "GR",
+          "unidade": "gAPI"
+        },
+        "RHOB": {
+          "quadro": "LAS",
+          "mnemonico": "RHOB",
+          "unidade": "g/cm3"
+        },
+        "NPHI": {
+          "quadro": "LAS",
+          "mnemonico": "NPHI",
+          "unidade": "%"
+        },
+        "RT": {
+          "quadro": "LAS",
+          "mnemonico": "ILD",
+          "unidade": "ohmm"
+        },
+        "CALI": {
+          "quadro": "LAS",
+          "mnemonico": "CALI",
+          "unidade": "in"
+        },
+        "BS": {
+          "quadro": "LAS",
+          "mnemonico": "BS",
+          "unidade": "in"
+        }
+      },
+      "metodos": {
+        "vsh": "linear",
+        "phi": "densidade_neutrao",
+        "sw": "archie"
+      },
+      "parametros": {
+        "vsh_metodo": "linear",
+        "gr_limpo": 30.0,
+        "gr_argila": 120.0,
+        "phi_metodo": "densidade_neutrao",
+        "rho_matriz": 2.65,
+        "rho_fluido": 1.0,
+        "dt_matriz": 55.5,
+        "dt_fluido": 189.0,
+        "phi_argila": 0.0,
+        "sw_metodo": "archie",
+        "rw": 0.05,
+        "a": 1.0,
+        "m": 2.0,
+        "n": 2.0,
+        "rsh": null,
+        "corte_vsh": 0.5,
+        "corte_phi": 0.08,
+        "corte_sw": 0.6,
+        "qc_cali_pol": 1.0,
+        "qc_drho": 0.15,
+        "bs_pol": null,
+        "passo": 0.5
+      },
+      "parametros_automaticos": {
+        "passo": "passo do GR",
+        "phi_metodo": "escolhido pelas curvas disponíveis"
+      },
+      "passo_m": 0.5,
+      "intervalos": [
+        {
+          "nome": "Açu",
+          "origem": "local",
+          "topo": 1005.0,
+          "base": 1035.0,
+          "bruto_m": 30.0,
+          "com_dados_m": 30.5,
+          "reservatorio_m": 20.0,
+          "net_pay_m": 10.0,
+          "ntg": 0.6557,
+          "ntg_pay": 0.3279,
+          "vsh_medio": 0.3443,
+          "phi_media_pay": 0.2,
+          "sw_media_pay": 0.25,
+          "phi_media_res": 0.2,
+          "hpv_m": 1.5,
+          "qc_arrombado_m": 0.5,
+          "qc_drho_m": 0.0,
+          "pay_com_qc_m": 0.0
+        }
+      ],
+      "siapp_versao": "0.35.0"
+    }
+  ]
+}

@@ -13,6 +13,8 @@ EXEMPLO = os.path.join(RAIZ, "contribuicoes", "exemplo.json")
 # Pacote exportado de verdade pelo SIAPP 0.10 (contrato entre os dois repositórios):
 # se o aplicativo mudar o formato sem mudar o esquema daqui, este teste quebra.
 DO_APP = os.path.join(RAIZ, "tests", "dados", "pacote-siapp-0.10.json")
+# Formato v3, exportado pelo SIAPP 0.35 (perfil sintético): fatos com trecho e interpretação de perfil.
+DO_APP_V3 = os.path.join(RAIZ, "tests", "dados", "pacote-siapp-0.35.json")
 
 
 def _pasta(tmp_path, *pacotes):
@@ -91,3 +93,40 @@ def test_compilar_preserva_autoria_e_fonte(tmp_path):
     assert linha == ("BARIGIRAS", "Ruan da Silva Nobre")
     f = con.execute("SELECT poco, pagina, caixa, fonte_sha256 FROM fatos").fetchone()
     assert f[0] == "7-GMR-13-RN" and f[1] == 28 and json.loads(f[2])[0] == 0.7642 and len(f[3]) == 64
+
+
+def test_pacote_v3_exportado_pelo_siapp_e_valido(tmp_path):
+    c = _ler(DO_APP_V3)
+    assert c["versao_formato"] == 3 and c["interpretacoes"] and any(f["tipo"] == "trecho" for f in c["fatos"])
+    assert validar.validar(_pasta(tmp_path, c)) == []
+
+
+def test_interpretacao_invalida(tmp_path):
+    c = _ler(DO_APP_V3)
+    i = c["interpretacoes"][0]
+    i["intervalos"][0]["base"] = i["intervalos"][0]["topo"] - 1
+    i["metodos"]["sw"] = "magia"
+    i["parametros"]["chute"] = 1
+    erros = " ".join(validar.validar(_pasta(tmp_path, c)))
+    assert "acima do topo" in erros and "metodos/sw" in erros and "chute" in erros
+
+
+def test_interpretacao_em_pacote_v2_e_recusada(tmp_path):
+    c = _ler(DO_APP_V3, versao_formato=2)
+    assert any("interpretacoes" in e for e in validar.validar(_pasta(tmp_path, c)))
+
+
+def test_mesma_interpretacao_de_outro_autor_e_conflito(tmp_path):
+    a = _ler(DO_APP_V3)
+    b = _ler(DO_APP_V3, id="11111111-2222-4333-8444-555555555555", autor={"nome": "Outra Pessoa"}, fatos=[])
+    assert any("CONFLITO na interpretação" in e for e in validar.validar(_pasta(tmp_path, a, b)))
+
+
+def test_compilar_leva_as_interpretacoes(tmp_path):
+    shutil.copy(DO_APP_V3, tmp_path / "v3.json")
+    r = compilar.compilar(str(tmp_path), str(tmp_path / "dist"), versao="v2026.11.0")
+    assert r["interpretacoes"] == 1 and r["fatos"] == 2
+    con = sqlite3.connect(tmp_path / "dist" / "siapp-dados.sqlite")
+    poco, autor, dados = con.execute("SELECT poco, autor, dados FROM interpretacoes").fetchone()
+    d = json.loads(dados)
+    assert poco == "7-TST-1-RN" and autor == "Ruan da Silva Nobre" and d["parametros"]["rw"] == 0.05

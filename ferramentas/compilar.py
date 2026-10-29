@@ -13,9 +13,12 @@ Esquema da base (versao_formato_base 1 — o SIAPP confere antes de aplicar):
                  criado_em, fonte_sha256, fonte_caminho, fonte_bacia, pagina, caixa (JSON),
                  autor, contribuicao
   apelidos       apelido, poco, contribuicao
+  interpretacoes id, poco, titulo, autor, criado_em, dados (JSON: o item do pacote inteiro),
+                 contribuicao — interpretações de perfil (formato v3; o SIAPP 0.35+ aplica,
+                 os anteriores ignoram a tabela)
 
-Cada linha guarda o pacote de origem: a autoria nunca se perde. Um fato reenviado
-pelo mesmo autor (mesmo id) entra uma vez, na versão mais nova.
+Cada linha guarda o pacote de origem: a autoria nunca se perde. Um fato ou uma
+interpretação reenviada pelo mesmo autor (mesmo id) entra uma vez, na versão mais nova.
 
 Uso:  python ferramentas/compilar.py [--versao v2026.10.0]
 """
@@ -43,7 +46,10 @@ CREATE TABLE fatos (id TEXT PRIMARY KEY, poco TEXT, tipo TEXT, nome TEXT, valor 
                     fonte_sha256 TEXT, fonte_caminho TEXT, fonte_bacia TEXT, pagina INTEGER,
                     caixa TEXT, autor TEXT, contribuicao TEXT REFERENCES contribuicoes(id));
 CREATE TABLE apelidos (apelido TEXT, poco TEXT, contribuicao TEXT REFERENCES contribuicoes(id));
+CREATE TABLE interpretacoes (id TEXT PRIMARY KEY, poco TEXT, titulo TEXT, autor TEXT, criado_em TEXT,
+                             dados TEXT, contribuicao TEXT REFERENCES contribuicoes(id));
 CREATE INDEX fatos_poco ON fatos(poco);
+CREATE INDEX interpretacoes_poco ON interpretacoes(poco);
 """
 
 
@@ -92,13 +98,18 @@ def compilar(pasta_contrib: str | None = None, saida: str | None = None, versao:
                          json.dumps(fo["caixa"]) if fo.get("caixa") else None, a["nome"], c["id"]))
         for ap in c.get("apelidos", []):
             con.execute("INSERT INTO apelidos VALUES (?,?,?)", (ap["apelido"], ap["poco"], c["id"]))
+        for i in c.get("interpretacoes", []):
+            con.execute("INSERT OR REPLACE INTO interpretacoes VALUES (?,?,?,?,?,?,?)",
+                        (i["id"], i["poco"], i.get("titulo"), a["nome"], i.get("criado_em"),
+                         json.dumps(i, ensure_ascii=False), c["id"]))
     n_fatos = con.execute("SELECT count(*) FROM fatos").fetchone()[0]
+    n_interp = con.execute("SELECT count(*) FROM interpretacoes").fetchone()[0]
     con.commit()
     con.close()
     with open(os.path.join(saida, "vocabulario.json"), "w", encoding="utf-8") as f:
         json.dump(vocab, f, ensure_ascii=False, indent=2)
     return {"contribuicoes": len(pacotes), "correcoes": len(vocab["correcoes"]),
-            "palavras": len(vocab["palavras"]), "fatos": n_fatos, "versao": versao}
+            "palavras": len(vocab["palavras"]), "fatos": n_fatos, "interpretacoes": n_interp, "versao": versao}
 
 
 if __name__ == "__main__":
