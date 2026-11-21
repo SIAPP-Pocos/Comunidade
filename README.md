@@ -1,11 +1,11 @@
 # SIAPP — Dados comunitários do acervo REATE
 
-[![validar](https://github.com/SIAPP-Pocos/SIAPP-dados/actions/workflows/validar.yml/badge.svg)](https://github.com/SIAPP-Pocos/SIAPP-dados/actions/workflows/validar.yml)
+[![validar](https://github.com/SIAPP-Pocos/Comunidade/actions/workflows/validar.yml/badge.svg)](https://github.com/SIAPP-Pocos/Comunidade/actions/workflows/validar.yml)
 [![licença: CC BY 4.0](https://img.shields.io/badge/licen%C3%A7a-CC%20BY%204.0-lightgrey)](LICENSE)
 
 Base aberta e revisada de **correções e dados tratados** do acervo público de poços
 da ANP (portal [REATE](https://reate.cprm.gov.br/anp/TERRESTRE), ANP/CPRM),
-produzida com a ferramenta [SIAPP](https://github.com/SIAPP-Pocos/siapp).
+produzida com a ferramenta [SIAPP](https://github.com/SIAPP-Pocos/SIAPP).
 
 Quem usa o SIAPP baixa esta base e recebe os documentos **já tratados**: palavras
 lidas errado pelo OCR corrigidas, vocabulário técnico e **dados transcritos e
@@ -46,8 +46,11 @@ tests/dados/        pacotes exportados de verdade pelo SIAPP: o contrato entre o
 3. O GitHub **valida automaticamente**: formato, campos obrigatórios, ausência de
    correção de números, e **conflitos** com correções de outros autores.
 4. Um mantenedor **revisa** e aceita.
-5. A cada versão (etiqueta `vAAAA.MM.N`), a base consolidada é publicada em
-   **Releases** — é o que o SIAPP baixa.
+5. **Logo depois de cada aceite**, o GitHub compila tudo e publica uma versão nova da base em
+   **Releases** (etiqueta `vAAAA.MM.N`, ex.: `v2026.11.0`) — é o que o SIAPP baixa. Junto vai
+   `resumo.json`, um arquivo pequeno com o que tem na base, para o SIAPP saber se vale baixar.
+
+`contribuicoes/exemplo.json` mostra o formato e não entra na base.
 
 ## Princípios
 

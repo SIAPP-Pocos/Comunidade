@@ -4,6 +4,10 @@ Compila todas as contribuições numa base única, para o SIAPP baixar.
 Saída em dist/:
   siapp-dados.sqlite   a base que o SIAPP aplica (aba Comunidade → Atualizar)
   vocabulario.json     vocabulário consolidado, para quem quiser usar sem o SIAPP
+  resumo.json          o que tem na base (contagens e a lista de pacotes, com os poços de cada um):
+                       pequeno, para o SIAPP saber o que mudou antes de baixar a base inteira
+
+contribuicoes/exemplo.json mostra o formato e não entra na base.
 
 Esquema da base (versao_formato_base 1 — o SIAPP confere antes de aplicar):
   meta           formato, versao_formato_base, versao_base, gerado_em
@@ -32,6 +36,7 @@ import sqlite3
 from datetime import datetime, timezone
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+FORA_DA_BASE = {"exemplo.json"}
 FORMATO_BASE = "siapp-dados-base"
 VERSAO_FORMATO_BASE = 1
 
@@ -69,6 +74,8 @@ def compilar(pasta_contrib: str | None = None, saida: str | None = None, versao:
     vocab = {"palavras": [], "correcoes": {}, "ignorar": []}
     pacotes = []
     for caminho in sorted(glob.glob(os.path.join(pasta_contrib, "*.json"))):
+        if os.path.basename(caminho) in FORA_DA_BASE:
+            continue
         with open(caminho, encoding="utf-8") as f:
             pacotes.append((os.path.basename(caminho), json.load(f)))
     pacotes.sort(key=lambda x: x[1].get("criado_em", ""))     # o mais novo sobrescreve fatos repetidos
@@ -104,12 +111,30 @@ def compilar(pasta_contrib: str | None = None, saida: str | None = None, versao:
                          json.dumps(i, ensure_ascii=False), c["id"]))
     n_fatos = con.execute("SELECT count(*) FROM fatos").fetchone()[0]
     n_interp = con.execute("SELECT count(*) FROM interpretacoes").fetchone()[0]
+    pocos = {p for (p,) in con.execute("SELECT poco FROM fatos UNION SELECT poco FROM interpretacoes")}
     con.commit()
     con.close()
     with open(os.path.join(saida, "vocabulario.json"), "w", encoding="utf-8") as f:
         json.dump(vocab, f, ensure_ascii=False, indent=2)
-    return {"contribuicoes": len(pacotes), "correcoes": len(vocab["correcoes"]),
-            "palavras": len(vocab["palavras"]), "fatos": n_fatos, "interpretacoes": n_interp, "versao": versao}
+    r = {"contribuicoes": len(pacotes), "correcoes": len(vocab["correcoes"]),
+         "palavras": len(vocab["palavras"]), "fatos": n_fatos, "interpretacoes": n_interp,
+         "pocos": len(pocos), "versao": versao}
+    resumo = {"formato": "siapp-dados-resumo", "versao_base": versao, "gerado_em": gerado,
+              "contagens": {k: v for k, v in r.items() if k != "versao"},
+              "pacotes": [_resumo_do_pacote(arq, c) for arq, c in pacotes]}
+    with open(os.path.join(saida, "resumo.json"), "w", encoding="utf-8") as f:
+        json.dump(resumo, f, ensure_ascii=False, indent=2)
+    return r
+
+
+def _resumo_do_pacote(arquivo: str, c: dict) -> dict:
+    v = c.get("vocabulario", {})
+    pocos = sorted({x["poco"] for x in c.get("fatos", []) + c.get("interpretacoes", [])})
+    return {"id": c["id"], "arquivo": arquivo, "autor": c["autor"]["nome"],
+            "instituicao": c["autor"].get("instituicao"), "criado_em": c["criado_em"],
+            "correcoes": len(v.get("correcoes", [])), "palavras": len(v.get("palavras", [])),
+            "fatos": len(c.get("fatos", [])), "interpretacoes": len(c.get("interpretacoes", [])),
+            "pocos": pocos}
 
 
 if __name__ == "__main__":

@@ -7,6 +7,8 @@ import sys
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(RAIZ, "ferramentas"))
 import compilar  # noqa: E402
+import notas  # noqa: E402
+import proxima_versao  # noqa: E402
 import validar   # noqa: E402
 
 EXEMPLO = os.path.join(RAIZ, "contribuicoes", "exemplo.json")
@@ -81,7 +83,7 @@ def test_id_repetido_e_campo_desconhecido(tmp_path):
 
 
 def test_compilar_preserva_autoria_e_fonte(tmp_path):
-    shutil.copy(EXEMPLO, tmp_path / "exemplo.json")
+    shutil.copy(EXEMPLO, tmp_path / "2026-10-15_nobre_exemplo.json")
     shutil.copy(DO_APP, tmp_path / "app.json")
     r = compilar.compilar(str(tmp_path), str(tmp_path / "dist"), versao="v2026.10.0")
     assert r["contribuicoes"] == 2 and r["fatos"] == 1 and r["versao"] == "v2026.10.0"
@@ -139,3 +141,45 @@ def test_parametros_da_referencia_do_gr_aceitos(tmp_path):
                                                 gr_ref_topo=1650.0, gr_ref_base=1750.0)
     c["interpretacoes"][0]["parametros_automaticos"]["gr_limpo"] = "mínimo do GR na janela (1650,0–1750,0 m)"
     assert validar.validar(_pasta(tmp_path, c)) == []
+
+
+def test_exemplo_nao_entra_na_base(tmp_path):
+    shutil.copy(EXEMPLO, tmp_path / "exemplo.json")
+    shutil.copy(DO_APP, tmp_path / "app.json")
+    r = compilar.compilar(str(tmp_path), str(tmp_path / "dist"))
+    assert r["contribuicoes"] == 1
+    con = sqlite3.connect(tmp_path / "dist" / "siapp-dados.sqlite")
+    assert con.execute("SELECT arquivo FROM contribuicoes").fetchall() == [("app.json",)]
+
+
+def test_resumo_lista_pacotes_e_pocos(tmp_path):
+    shutil.copy(DO_APP, tmp_path / "a.json")
+    shutil.copy(DO_APP_V3, tmp_path / "b.json")
+    r = compilar.compilar(str(tmp_path), str(tmp_path / "dist"), versao="v2026.11.0")
+    with open(tmp_path / "dist" / "resumo.json", encoding="utf-8") as f:
+        resumo = json.load(f)
+    assert resumo["formato"] == "siapp-dados-resumo" and resumo["versao_base"] == "v2026.11.0"
+    assert resumo["contagens"]["pocos"] == r["pocos"] >= 1
+    assert [p["arquivo"] for p in resumo["pacotes"]] and all("pocos" in p and p["autor"] for p in resumo["pacotes"])
+    pocos = set().union(*(p["pocos"] for p in resumo["pacotes"]))
+    assert "7-GMR-13-RN" in pocos and len(pocos) == r["pocos"]
+
+
+def test_notas_mostram_o_que_entrou(tmp_path):
+    shutil.copy(DO_APP, tmp_path / "a.json")
+    compilar.compilar(str(tmp_path), str(tmp_path / "d1"), versao="v2026.11.0")
+    shutil.copy(DO_APP_V3, tmp_path / "b.json")
+    compilar.compilar(str(tmp_path), str(tmp_path / "d2"), versao="v2026.11.1")
+    r1 = notas._ler(str(tmp_path / "d1" / "resumo.json"))
+    r2 = notas._ler(str(tmp_path / "d2" / "resumo.json"))
+    assert "Primeira versão" in notas.notas(r1)
+    texto = notas.notas(r2, r1)
+    assert "Desde a v2026.11.0:** 1 pacote novo" in texto and texto.count("\n- ") == 1
+    assert "nenhum pacote novo" in notas.notas(r2, r2)
+
+
+def test_proxima_versao():
+    assert proxima_versao.proxima([], "2026.11") == "v2026.11.0"
+    assert proxima_versao.proxima(["v2026.10.4", "v2026.11.0", "v2026.11.1"], "2026.11") == "v2026.11.2"
+    assert proxima_versao.proxima(["v2026.10.4"], "2026.11") == "v2026.11.0"
+    assert proxima_versao.proxima(["v2026.11.10", "v2026.11.9", "v2026.110.3"], "2026.11") == "v2026.11.11"

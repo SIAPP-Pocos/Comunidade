@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/SIAPP-Pocos/SIAPP-dados/esquema/contribuicao-v3.schema.json",
+  "$id": "https://github.com/SIAPP-Pocos/Comunidade/esquema/contribuicao-v3.schema.json",
   "title": "Contribuição SIAPP — versão 3",
   "description": "Pacote de correções e dados tratados do acervo público REATE (ANP/CPRM), gerado pelo SIAPP 0.35 ou mais novo. Nunca contém os arquivos originais do portal: documentos são identificados pelo caminho no REATE e pelo hash SHA-256 do conteúdo. Novidades em relação à versão 2: interpretações de perfil (avaliações de formação com parâmetros e resumo por intervalo, sem as curvas calculadas) e o tipo de fato `trecho` (citação de texto livre).",
   "type": "object",

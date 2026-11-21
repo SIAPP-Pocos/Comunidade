@@ -1,29 +1,64 @@
 name: publicar base
 
-# Ao criar uma etiqueta de versão (ex.: v2026.10.0), compila todas as
-# contribuições e publica a base consolidada como Release, para o SIAPP baixar.
+# Logo depois de cada aceite (pull request aprovado e juntado à main, ou envio direto do
+# mantenedor) que mexa nas contribuições ou no vocabulário: valida, compila todas as
+# contribuições e publica a base consolidada como uma versão nova (vAAAA.MM.N), que é o que o
+# SIAPP baixa. "Run workflow" (aba Actions) publica na hora, sem precisar de um envio.
 on:
   push:
-    tags: ["v*"]
+    branches: [main]
+    paths:
+      - "contribuicoes/**"
+      - "vocabulario/**"
+  workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: publicar-base           # duas aprovações seguidas viram duas versões, uma depois da outra
+  cancel-in-progress: false
 
 jobs:
   publicar:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0         # as etiquetas antigas, para numerar a próxima
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - run: pip install "jsonschema[format]"
+      - run: pip install "jsonschema[format]" pytest
       - run: python ferramentas/validar.py
-      - run: python ferramentas/compilar.py --versao "$GITHUB_REF_NAME"
-      - name: Criar Release com a base compilada
+      - run: pytest -q
+      - name: Numerar a versão
+        id: versao
+        run: |
+          git fetch --tags --force
+          echo "etiqueta=$(git tag -l 'v*' | python ferramentas/proxima_versao.py)" >> "$GITHUB_OUTPUT"
+      - name: Compilar
+        id: compilar
+        run: |
+          python ferramentas/compilar.py --versao "${{ steps.versao.outputs.etiqueta }}"
+          echo "pacotes=$(python -c 'import json; print(json.load(open("dist/resumo.json"))["contagens"]["contribuicoes"])')" >> "$GITHUB_OUTPUT"
+      - name: Notas (o que entrou desde a última versão)
+        if: steps.compilar.outputs.pacotes != '0'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" dist/siapp-dados.sqlite dist/vocabulario.json \
-            --title "Base SIAPP $GITHUB_REF_NAME" \
-            --notes "Base consolidada de todas as contribuições até esta versão. Licença CC-BY 4.0."
+          mkdir -p anterior
+          gh release download --pattern resumo.json --dir anterior 2>/dev/null || true
+          python ferramentas/notas.py dist/resumo.json anterior/resumo.json > dist/notas.md
+          cat dist/notas.md
+      - name: Publicar a versão
+        if: steps.compilar.outputs.pacotes != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ETIQUETA: ${{ steps.versao.outputs.etiqueta }}
+        run: |
+          gh release create "$ETIQUETA" dist/siapp-dados.sqlite dist/vocabulario.json dist/resumo.json \
+            --target "$GITHUB_SHA" --title "Base SIAPP $ETIQUETA" --notes-file dist/notas.md --latest
+      - name: Nada a publicar
+        if: steps.compilar.outputs.pacotes == '0'
+        run: echo "::notice::Ainda não há contribuições aceitas (o exemplo não entra na base). Nada publicado."

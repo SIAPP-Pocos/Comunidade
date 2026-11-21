@@ -32,5 +32,7 @@ python ferramentas/validar.py
 Todo pull request precisa da aprovação de um mantenedor (`CODEOWNERS`). Na revisão,
 o mantenedor confere uma amostra das correções e **todos os fatos novos** contra a
 imagem da página no REATE (documento, página e caixa estão no próprio pacote).
+Assim que o pull request é aceito, o GitHub publica sozinho uma versão nova da base, e o
+SIAPP de quem usa avisa que há novidade.
 
 Ao participar, você concorda com o [Código de conduta](CODE_OF_CONDUCT.md).

@@ -6,6 +6,16 @@ compilada** é publicada com etiquetas `vAAAA.MM.N`.
 
 ## [Não lançado]
 ### Adicionado
+- **Publicação automática:** logo depois de cada aceite que mexa em `contribuicoes/` ou
+  `vocabulario/`, o GitHub valida, compila e publica a base como versão nova (`vAAAA.MM.N`,
+  numerada por `ferramentas/proxima_versao.py`), com notas do que entrou desde a anterior
+  (`ferramentas/notas.py`). "Run workflow" publica na hora. Sem contribuição aceita, nada sai.
+- `resumo.json` junto da base: contagens e a lista de pacotes, com autor e poços de cada um,
+  para o SIAPP saber o que mudou sem baixar a base inteira.
+### Mudado
+- O repositório passou a se chamar **Comunidade** (antes `SIAPP-dados`); endereços do README,
+  da citação e dos esquemas atualizados.
+- `contribuicoes/exemplo.json` não entra mais na base publicada: só mostra o formato.
 - Interpretações (v3) aceitam os parâmetros da referência do GR do SIAPP 0.36 (`gr_referencia`,
   `gr_estatistica`, `gr_ref_topo`, `gr_ref_base`).
 - Formato de contribuição **v3** (SIAPP 0.35): `interpretacoes` — interpretações de perfil
