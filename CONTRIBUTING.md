@@ -4,9 +4,15 @@
 
 1. Trabalhe no SIAPP: corrija o OCR e transcreva dados na aba **2. Documentos**; compartilhe avaliações de
    formação na aba **3. Perfis** (Compartilhar na biblioteca).
-2. Na aba **Comunidade** › Contribuir, clique em **Exportar pacote**. O SIAPP grava um arquivo `.json` com o seu
+2. Na aba **Comunidade** › Contribuir, clique em **Enviar para a comunidade** (SIAPP 1.4 ou mais novo). Na primeira
+   vez, entre com a sua conta do GitHub (gratuita) pelo código que o SIAPP mostra. Confirme o que vai e pronto: um
+   robô deste repositório confere o pacote e abre o pull request no seu nome; em **Seus envios** você acompanha.
+
+### Pelo site do GitHub (SIAPP mais antigo, ou se preferir)
+
+1. Na aba **Comunidade** › Contribuir, clique em **Exportar pacote**. O SIAPP grava um arquivo `.json` com o seu
    trabalho (não com os documentos do REATE) e **Abrir a pasta** mostra onde ele ficou.
-3. Mande o arquivo para cá pelo site do GitHub (precisa de uma conta, gratuita):
+2. Mande o arquivo para cá pelo site do GitHub (precisa de uma conta, gratuita):
    1. Abra <https://github.com/SIAPP-Pocos/Comunidade/tree/main/contribuicoes>.
    2. **Add file › Upload files** e arraste o `.json`.
    3. Em "Propose changes", escreva uma linha sobre o que vai no pacote e clique em **Propose changes** e depois em
@@ -18,6 +24,14 @@
 
 O que **não** vem para cá: os arquivos do REATE (PDF, DLIS, LAS…). Eles já são públicos na ANP; o pacote leva só a
 referência (SHA-256 e caminho no REATE), a página e a caixa de onde cada dado saiu.
+
+### Como o envio pelo SIAPP chega aqui
+
+O SIAPP abre uma issue com um resumo e a marca `<!-- siapp-pacote id=… partes=n sha256=… -->`, e põe o pacote
+(JSON compactado com gzip, em base64) em comentários `<!-- siapp-parte i/n -->`. O workflow **receber pacote**
+(`ferramentas/receber_pacote.py`) junta as partes (só as do autor da issue), confere o SHA-256, valida e abre o pull
+request no nome de quem enviou; se não serve, comenta o motivo e fecha a issue. Nada do que vem na issue é executado.
+O aplicativo do GitHub "SIAPP Comunidade" só tem permissão de abrir issues e ler pull requests, e só neste repositório.
 
 ## Regras de um bom pacote
 

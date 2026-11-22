@@ -41,8 +41,10 @@ tests/dados/        pacotes exportados de verdade pelo SIAPP: o contrato entre o
 
 ## Como os dados entram
 
-1. Quem usa o SIAPP corrige o texto dos documentos e **exporta uma contribuição**.
-2. A contribuição chega aqui por *pull request* (ou é enviada a um mantenedor).
+1. Quem usa o SIAPP corrige o texto dos documentos, transcreve dados e clica em **Enviar para a comunidade**
+   (SIAPP 1.4; entra com a conta do GitHub por um código, uma vez).
+2. Um robô deste repositório recebe o envio e abre o *pull request* no nome de quem enviou. Também vale mandar o
+   arquivo exportado pelo site do GitHub ou a um mantenedor ([CONTRIBUTING.md](CONTRIBUTING.md)).
 3. O GitHub **valida automaticamente**: formato, campos obrigatórios, ausência de
    correção de números, e **conflitos** com correções de outros autores.
 4. Um mantenedor **revisa** e aceita.

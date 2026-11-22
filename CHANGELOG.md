@@ -6,6 +6,9 @@ compilada** é publicada com etiquetas `vAAAA.MM.N`.
 
 ## [Não lançado]
 ### Adicionado
+- **Receber pacote enviado pelo SIAPP (1.4)**: workflow `receber pacote` e `ferramentas/receber_pacote.py`. O
+  SIAPP manda o pacote como issue (cabeçalho e partes em comentários); o robô junta, confere o SHA-256, valida e
+  abre o pull request no nome de quem enviou, ou comenta o motivo e fecha a issue.
 - **Publicação automática:** logo depois de cada aceite que mexa em `contribuicoes/` ou
   `vocabulario/`, o GitHub valida, compila e publica a base como versão nova (`vAAAA.MM.N`,
   numerada por `ferramentas/proxima_versao.py`), com notas do que entrou desde a anterior

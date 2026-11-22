@@ -1,0 +1,91 @@
+name: receber pacote
+
+# O SIAPP (1.4) envia um pacote como issue: o texto traz a marca <!-- siapp-pacote ... --> e o conteúdo vai em
+# comentários do próprio autor. Este workflow junta as partes, confere, valida e abre o pull request no nome de
+# quem enviou, para o mantenedor revisar. Nada do que vem na issue é executado: o conteúdo é lido como dado por
+# ferramentas/receber_pacote.py. Pull requests abertos pelo GitHub Actions precisam da opção "Allow GitHub
+# Actions to create and approve pull requests" (Settings › Actions › General).
+on:
+  issues:
+    types: [opened]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: receber-pacote-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  receber:
+    if: >-
+      github.event.issue.pull_request == null &&
+      github.event.issue.state == 'open' &&
+      contains(github.event.issue.body, '<!-- siapp-pacote') &&
+      (github.event_name == 'issues' || github.event.comment.user.login == github.event.issue.user.login)
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      N: ${{ github.event.issue.number }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: pip install "jsonschema[format]"
+      - name: Já foi recebido?
+        id: ja
+        run: |
+          if gh api "repos/$GITHUB_REPOSITORY/issues/$N/labels" --jq '.[].name' | grep -qx 'pacote recebido'; then
+            echo "sim=1" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Buscar a issue e os comentários
+        if: steps.ja.outputs.sim != '1'
+        run: |
+          mkdir -p "$RUNNER_TEMP/rec"
+          gh api "repos/$GITHUB_REPOSITORY/issues/$N" > "$RUNNER_TEMP/rec/issue.json"
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/issues/$N/comments" \
+            | python -c 'import json, sys; print(json.dumps([c for p in json.load(sys.stdin) for c in p]))' \
+            > "$RUNNER_TEMP/rec/comentarios.json"
+      - name: Juntar, conferir e validar
+        if: steps.ja.outputs.sim != '1'
+        id: rec
+        run: |
+          set +e
+          python ferramentas/receber_pacote.py "$RUNNER_TEMP/rec/issue.json" "$RUNNER_TEMP/rec/comentarios.json" "$RUNNER_TEMP/rec/saida"
+          echo "codigo=$?" >> "$GITHUB_OUTPUT"
+      - name: Abrir o pull request
+        if: steps.rec.outputs.codigo == '0'
+        env:
+          ARQUIVO: ${{ steps.rec.outputs.arquivo }}
+          NOME: ${{ steps.rec.outputs.nome }}
+          TITULO: ${{ steps.rec.outputs.titulo }}
+          LOGIN: ${{ github.event.issue.user.login }}
+          ID_USUARIO: ${{ github.event.issue.user.id }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          ramo="pacote/issue-$N-$GITHUB_RUN_ID"
+          git switch -c "$ramo"
+          git add "contribuicoes/$ARQUIVO"
+          git commit -q --author="$NOME <$ID_USUARIO+$LOGIN@users.noreply.github.com>" -m "$TITULO (#$N)"
+          git push -q origin "$ramo"
+          url=$(gh pr create --base main --head "$ramo" --title "$TITULO" --body-file "$RUNNER_TEMP/rec/saida/pr.md")
+          numero="${url##*/}"
+          gh label create "pacote recebido" --color 0e8a16 --description "Virou pull request" --force >/dev/null
+          gh issue edit "$N" --add-label "pacote recebido"
+          printf '<!-- siapp-pr: %s -->\nRecebido e conferido. Virou o pull request %s, que agora espera a revisão. Quando for aceito, a base nova sai sozinha.\n' "$numero" "$url" > "$RUNNER_TEMP/rec/comentario.md"
+          gh issue comment "$N" --body-file "$RUNNER_TEMP/rec/comentario.md"
+      - name: Avisar que não serviu
+        if: steps.rec.outputs.codigo == '1'
+        run: |
+          { echo '<!-- siapp-erro -->'; echo 'O pacote não pôde ser recebido:'; echo; cat "$RUNNER_TEMP/rec/saida/erro.md"; echo;
+            echo 'Nada foi gravado. Corrija no SIAPP e envie de novo.'; } > "$RUNNER_TEMP/rec/comentario.md"
+          gh issue comment "$N" --body-file "$RUNNER_TEMP/rec/comentario.md"
+          gh label create "pacote recusado" --color d93f0b --description "Não passou na conferência" --force >/dev/null
+          gh issue edit "$N" --add-label "pacote recusado"
+          gh issue close "$N" --reason "not planned"
