@@ -2,9 +2,22 @@
 
 ## Pelo SIAPP (recomendado)
 
-1. Processe e corrija documentos na aba **Documentos** do SIAPP.
-2. Use **Exportar contribuição** — o SIAPP gera o arquivo no formato deste repositório.
-3. Envie o arquivo para `contribuicoes/` por *pull request*, ou mande para um mantenedor.
+1. Trabalhe no SIAPP: corrija o OCR e transcreva dados na aba **2. Documentos**; compartilhe avaliações de
+   formação na aba **3. Perfis** (Compartilhar na biblioteca).
+2. Na aba **Comunidade** › Contribuir, clique em **Exportar pacote**. O SIAPP grava um arquivo `.json` com o seu
+   trabalho (não com os documentos do REATE) e **Abrir a pasta** mostra onde ele ficou.
+3. Mande o arquivo para cá pelo site do GitHub (precisa de uma conta, gratuita):
+   1. Abra <https://github.com/SIAPP-Pocos/Comunidade/tree/main/contribuicoes>.
+   2. **Add file › Upload files** e arraste o `.json`.
+   3. Em "Propose changes", escreva uma linha sobre o que vai no pacote e clique em **Propose changes** e depois em
+      **Create pull request**. O GitHub faz a cópia do repositório na sua conta sozinho.
+   4. A validação roda em minutos (o resultado aparece no pull request). Depois da revisão e do aceite, a base nova
+      sai sozinha e o SIAPP de todo mundo avisa.
+
+   Sem conta no GitHub, mande o arquivo para um mantenedor, que faz o envio com o seu nome no pacote.
+
+O que **não** vem para cá: os arquivos do REATE (PDF, DLIS, LAS…). Eles já são públicos na ANP; o pacote leva só a
+referência (SHA-256 e caminho no REATE), a página e a caixa de onde cada dado saiu.
 
 ## Regras de um bom pacote
 
