@@ -151,6 +151,19 @@ def receber(issue: dict, comentarios: list[dict], pasta_contrib: str) -> dict:
             "conflitos": [e for e in erros if "CONFLITO" in e]}
 
 
+def _n(n: int, um: str, varios: str) -> str:
+    return f"{n} {um if n == 1 else varios}"
+
+
+def resumo_curto(it: dict) -> str:
+    """"2 correções, 1 dado transcrito" (só o que tem; "vocabulário" se for só isso)."""
+    partes = [_n(it["correcoes"], "correção", "correções") if it["correcoes"] else "",
+              _n(it["palavras"], "palavra", "palavras") if it["palavras"] else "",
+              _n(it["fatos"], "dado transcrito", "dados transcritos") if it["fatos"] else "",
+              _n(it["interpretacoes"], "interpretação", "interpretações") if it["interpretacoes"] else ""]
+    return ", ".join(p for p in partes if p) or "vocabulário"
+
+
 def texto_pr(r: dict, numero_issue: int) -> str:
     a, it = r["autor"], r["itens"]
     quem = a.get("nome", "?") + (f" ({a['instituicao']})" if a.get("instituicao") else "")
@@ -196,8 +209,7 @@ def main(argv: list[str]) -> int:
     it = r["itens"]
     with open(os.environ.get("GITHUB_OUTPUT", os.devnull), "a", encoding="utf-8") as f:
         f.write(f"arquivo={r['arquivo']}\nnome={nome}\n")
-        f.write(f"titulo=Pacote de {nome}: {it['correcoes']} correções, {it['fatos']} fatos, "
-                f"{it['interpretacoes']} interpretações\n")
+        f.write(f"titulo=Pacote de {nome}: {resumo_curto(it)}\n")
     print("PRONTO:", r["arquivo"])
     return 0
 

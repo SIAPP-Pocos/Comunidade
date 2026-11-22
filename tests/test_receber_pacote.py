@@ -110,3 +110,10 @@ def test_main_escreve_as_saidas(pacote, tmp_path, monkeypatch):
     assert (tmp_path / "s" / "pr.md").exists()
     (tmp_path / "c.json").write_text("[]")
     assert rp.main(["x", str(tmp_path / "i.json"), str(tmp_path / "c.json"), str(tmp_path / "s")]) == 2
+
+
+def test_resumo_curto_no_singular_e_no_plural():
+    assert rp.resumo_curto({"correcoes": 1, "palavras": 1, "fatos": 0, "interpretacoes": 0}) == "1 correção, 1 palavra"
+    assert rp.resumo_curto({"correcoes": 0, "palavras": 0, "fatos": 3, "interpretacoes": 2}) == \
+        "3 dados transcritos, 2 interpretações"
+    assert rp.resumo_curto({"correcoes": 0, "palavras": 0, "fatos": 0, "interpretacoes": 0}) == "vocabulário"
