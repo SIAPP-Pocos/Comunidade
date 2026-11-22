@@ -1,0 +1,27 @@
+{
+  "formato": "siapp-contribuicao",
+  "versao_formato": 3,
+  "id": "f6a419b7-2bbd-4e11-8460-2260440b56cd",
+  "criado_em": "2026-11-22T10:52:51-03:00",
+  "siapp_versao": "1.4.0",
+  "licenca": "CC-BY-4.0",
+  "autor": {
+    "nome": "Ruan Nobre",
+    "instituicao": "UFAL"
+  },
+  "vocabulario": {
+    "palavras": [
+      "HALLIBURTON"
+    ],
+    "correcoes": [
+      {
+        "de": "HALLISUR",
+        "para": "HALLIBURTON"
+      }
+    ],
+    "manter_original": []
+  },
+  "fatos": [],
+  "apelidos": [],
+  "interpretacoes": []
+}
